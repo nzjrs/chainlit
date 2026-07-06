@@ -209,6 +209,14 @@ cot = "full"
 # The style of alert boxes. Can be "classic" or "modern".
 alert_style = "classic"
 
+# Position of toast notifications. One of "top-left", "top-center",
+# "top-right", "bottom-left", "bottom-center", "bottom-right".
+# toast_position = "top-right"
+
+# Whether toast notifications are colored by type (info/success/warning/error).
+# Set to false to follow the app theme instead.
+# toast_rich_colors = true
+
 # Specify additional attributes for custom JS file
 # custom_js_attributes = "async type = \\\"module\\\""
 
@@ -389,6 +397,17 @@ class UISettings(BaseModel):
     custom_js: Optional[str] = None
 
     alert_style: Optional[Literal["classic", "modern"]] = "classic"
+    toast_position: Optional[
+        Literal[
+            "top-left",
+            "top-center",
+            "top-right",
+            "bottom-left",
+            "bottom-center",
+            "bottom-right",
+        ]
+    ] = "top-right"
+    toast_rich_colors: bool = True
     custom_js_attributes: Optional[str] = "defer"
     login_page_image: Optional[str] = None
     login_page_image_filter: Optional[str] = None

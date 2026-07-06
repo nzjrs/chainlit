@@ -52,6 +52,14 @@ export interface IChainlitConfig {
     custom_js?: string;
     custom_font?: string;
     alert_style?: 'classic' | 'modern';
+    toast_position?:
+      | 'top-left'
+      | 'top-center'
+      | 'top-right'
+      | 'bottom-left'
+      | 'bottom-center'
+      | 'bottom-right';
+    toast_rich_colors?: boolean;
     login_page_image?: string;
     login_page_image_filter?: string;
     login_page_image_dark_filter?: string;
