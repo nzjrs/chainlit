@@ -1,16 +1,17 @@
+import { cn } from '@/lib/utils';
 import { Toaster as Sonner } from 'sonner';
 
 import { useTheme } from '../ThemeProvider';
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
-const Toaster = ({ ...props }: ToasterProps) => {
+const Toaster = ({ className, ...props }: ToasterProps) => {
   const { variant } = useTheme();
 
   return (
     <Sonner
       theme={variant}
-      className="toaster group"
+      className={cn('toaster group', className)}
       toastOptions={{
         classNames: {
           toast:

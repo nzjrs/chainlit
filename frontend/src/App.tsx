@@ -86,7 +86,11 @@ function App() {
       storageKey="vite-ui-theme"
       defaultTheme={data?.default_theme}
     >
-      <Toaster richColors className="toast" position="top-right" />
+      <Toaster
+        richColors={config?.ui?.toast_rich_colors ?? true}
+        className="toast"
+        position={config?.ui?.toast_position ?? 'top-right'}
+      />
 
       <ChatSettingsModal />
       <RouterProvider router={router} />
