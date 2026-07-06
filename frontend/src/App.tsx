@@ -4,14 +4,22 @@ import { RouterProvider } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { router } from 'router';
 
-import { useAuth, useChatSession, useConfig } from '@chainlit/react-client';
+import {
+  setToastMarkdownRenderer,
+  useAuth,
+  useChatSession,
+  useConfig
+} from '@chainlit/react-client';
 
 import ChatSettingsModal from './components/ChatSettings';
 import { ThemeProvider } from './components/ThemeProvider';
 import { Loader } from '@/components/Loader';
+import { ToastMarkdown } from '@/components/ToastMarkdown';
 import { Toaster } from '@/components/ui/sonner';
 
 import { userEnvState } from 'state/user';
+
+setToastMarkdownRenderer((message) => <ToastMarkdown>{message}</ToastMarkdown>);
 
 declare global {
   interface Window {

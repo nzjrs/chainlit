@@ -37,6 +37,19 @@ InputWidgetType = Literal[
     "datepicker",
 ]
 ToastType = Literal["info", "success", "warning", "error"]
+ToastPosition = Literal[
+    "top-left",
+    "top-center",
+    "top-right",
+    "bottom-left",
+    "bottom-center",
+    "bottom-right",
+]
+
+
+class ToastAction(TypedDict):
+    label: str
+    url: str
 
 
 class ThreadDict(TypedDict):

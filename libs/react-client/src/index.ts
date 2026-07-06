@@ -5,6 +5,7 @@ export * from './useChatSession';
 export * from './useAudio';
 export * from './useConfig';
 export * from './api';
+export * from './toast';
 export * from './types';
 export * from './context';
 export * from './state';

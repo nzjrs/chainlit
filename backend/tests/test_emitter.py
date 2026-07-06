@@ -209,3 +209,70 @@ async def test_send_toast_invalid_type(emitter: ChainlitEmitter) -> None:
     message = "This is a test message"
     with pytest.raises(ValueError, match="Invalid toast type: invalid"):
         await emitter.send_toast(message, type="invalid")  # type: ignore[arg-type]
+
+
+async def test_send_toast_with_options(
+    emitter: ChainlitEmitter, mock_websocket_session: MagicMock
+) -> None:
+    message = "This is a test message"
+    await emitter.send_toast(
+        message,
+        type="warning",
+        duration=10,
+        position="bottom-center",
+        close_button=True,
+        markdown=True,
+        action={"label": "Open", "url": "https://example.com"},
+    )
+    mock_websocket_session.emit.assert_called_once_with(
+        "toast",
+        {
+            "message": message,
+            "type": "warning",
+            "duration": 10,
+            "position": "bottom-center",
+            "closeButton": True,
+            "markdown": True,
+            "action": {"label": "Open", "url": "https://example.com"},
+        },
+    )
+
+
+async def test_send_toast_infinite_duration(
+    emitter: ChainlitEmitter, mock_websocket_session: MagicMock
+) -> None:
+    message = "This is a test message"
+    await emitter.send_toast(message, duration="infinite")
+    mock_websocket_session.emit.assert_called_once_with(
+        "toast", {"message": message, "type": "info", "duration": "infinite"}
+    )
+
+
+async def test_send_toast_omits_default_options(
+    emitter: ChainlitEmitter, mock_websocket_session: MagicMock
+) -> None:
+    message = "This is a test message"
+    await emitter.send_toast(message, close_button=False, markdown=False)
+    mock_websocket_session.emit.assert_called_once_with(
+        "toast", {"message": message, "type": "info"}
+    )
+
+
+async def test_send_toast_invalid_position(emitter: ChainlitEmitter) -> None:
+    message = "This is a test message"
+    with pytest.raises(ValueError, match="Invalid toast position: middle"):
+        await emitter.send_toast(message, position="middle")  # type: ignore[arg-type]
+
+
+async def test_send_toast_invalid_duration(emitter: ChainlitEmitter) -> None:
+    message = "This is a test message"
+    with pytest.raises(ValueError, match="Invalid toast duration: -1"):
+        await emitter.send_toast(message, duration=-1)
+    with pytest.raises(ValueError, match="Invalid toast duration: forever"):
+        await emitter.send_toast(message, duration="forever")  # type: ignore[arg-type]
+
+
+async def test_send_toast_invalid_action(emitter: ChainlitEmitter) -> None:
+    message = "This is a test message"
+    with pytest.raises(ValueError, match="Toast action requires 'label' and 'url'"):
+        await emitter.send_toast(message, action={"label": "Open"})  # type: ignore[arg-type]

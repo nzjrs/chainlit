@@ -3,8 +3,13 @@ import { Toaster } from 'sonner';
 import { IWidgetConfig } from 'types';
 import Widget from 'widget';
 
+import { ToastMarkdown } from '@chainlit/app/src/components/ToastMarkdown';
 import { useTranslation } from '@chainlit/app/src/components/i18n/Translator';
-import { ChainlitContext, useAuth } from '@chainlit/react-client';
+import {
+  ChainlitContext,
+  setToastMarkdownRenderer,
+  useAuth
+} from '@chainlit/react-client';
 
 import { useCopilotInteract } from './hooks/useCopilotInteract';
 
@@ -13,6 +18,8 @@ import {
   COPILOT_THREAD_CHANGED_EVENT_KEY,
   CopilotThreadChangedEventParams
 } from './state';
+
+setToastMarkdownRenderer((message) => <ToastMarkdown>{message}</ToastMarkdown>);
 
 interface Props {
   widgetConfig: IWidgetConfig;

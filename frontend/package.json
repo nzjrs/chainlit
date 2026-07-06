@@ -67,7 +67,7 @@
     "remark-directive": "^3.0.1",
     "remark-gfm": "^4.0.0",
     "remark-math": "^6.0.0",
-    "sonner": "^1.2.3",
+    "sonner": "^1.7.1",
     "swr": "^2.2.2",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
