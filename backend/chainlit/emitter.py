@@ -24,6 +24,8 @@ from chainlit.types import (
     MessagePayload,
     OutputAudioChunk,
     ThreadDict,
+    ToastAction,
+    ToastPosition,
     ToastType,
 )
 from chainlit.user import PersistedUser
@@ -151,7 +153,17 @@ class BaseChainlitEmitter:
         """Stub method to send custom data to the host window."""
         pass
 
-    async def send_toast(self, message: str, type: Optional[ToastType] = "info"):
+    async def send_toast(
+        self,
+        message: str,
+        type: Optional[ToastType] = "info",
+        *,
+        duration: Optional[Union[float, Literal["infinite"]]] = None,
+        position: Optional[ToastPosition] = None,
+        close_button: bool = False,
+        markdown: bool = False,
+        action: Optional[ToastAction] = None,
+    ):
         """Stub method to send a toast message to the UI."""
         pass
 
@@ -465,9 +477,54 @@ class ChainlitEmitter(BaseChainlitEmitter):
         """Send custom data to the host window."""
         return self.emit("window_message", data)
 
-    async def send_toast(self, message: str, type: Optional[ToastType] = "info"):
-        """Send a toast message to the UI."""
+    async def send_toast(
+        self,
+        message: str,
+        type: Optional[ToastType] = "info",
+        *,
+        duration: Optional[Union[float, Literal["infinite"]]] = None,
+        position: Optional[ToastPosition] = None,
+        close_button: bool = False,
+        markdown: bool = False,
+        action: Optional[ToastAction] = None,
+    ):
+        """Send a toast message to the UI.
+
+        Args:
+            message: The text to display. Rendered as markdown if markdown=True.
+            type: One of "info", "success", "warning", "error".
+            duration: Display time in seconds, or "infinite" to persist until
+                dismissed. Defaults to the UI default (4 seconds).
+            position: Where to display the toast. Defaults to the UI default
+                (top-right).
+            close_button: Show an explicit close button on the toast.
+            markdown: Render the message as markdown instead of plain text.
+            action: Optional action button, e.g. {"label": "Open", "url": "..."}.
+                The URL opens in a new tab.
+        """
         # check that the type is valid using ToastType
         if type not in get_args(ToastType):
             raise ValueError(f"Invalid toast type: {type}")
-        await self.emit("toast", {"message": message, "type": type})
+        if position is not None and position not in get_args(ToastPosition):
+            raise ValueError(f"Invalid toast position: {position}")
+        if duration is not None:
+            if isinstance(duration, str):
+                if duration != "infinite":
+                    raise ValueError(f"Invalid toast duration: {duration}")
+            elif duration <= 0:
+                raise ValueError(f"Invalid toast duration: {duration}")
+        if action is not None and ("label" not in action or "url" not in action):
+            raise ValueError("Toast action requires 'label' and 'url' keys")
+
+        payload: Dict[str, Any] = {"message": message, "type": type}
+        if duration is not None:
+            payload["duration"] = duration
+        if position is not None:
+            payload["position"] = position
+        if close_button:
+            payload["closeButton"] = True
+        if markdown:
+            payload["markdown"] = True
+        if action is not None:
+            payload["action"] = action
+        await self.emit("toast", payload)

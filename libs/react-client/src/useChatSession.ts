@@ -7,7 +7,7 @@ import {
   useSetRecoilState
 } from 'recoil';
 import io from 'socket.io-client';
-import { toast } from 'sonner';
+import { type ExternalToast, toast } from 'sonner';
 import {
   actionState,
   askUserState,
@@ -36,6 +36,7 @@ import {
   wavRecorderState,
   wavStreamPlayerState
 } from 'src/state';
+import { renderToastMessage } from 'src/toast';
 import {
   IAction,
   ICommand,
@@ -468,30 +469,63 @@ const useChatSession = () => {
         }
       });
 
-      socket.on('toast', (data: { message: string; type: string }) => {
-        if (!data.message) {
-          console.warn('No message received for toast.');
-          return;
-        }
+      socket.on(
+        'toast',
+        (data: {
+          message: string;
+          type: string;
+          duration?: number | 'infinite';
+          position?: ExternalToast['position'];
+          closeButton?: boolean;
+          markdown?: boolean;
+          action?: { label: string; url: string };
+        }) => {
+          if (!data.message) {
+            console.warn('No message received for toast.');
+            return;
+          }
 
-        switch (data.type) {
-          case 'info':
-            toast.info(data.message);
-            break;
-          case 'error':
-            toast.error(data.message);
-            break;
-          case 'success':
-            toast.success(data.message);
-            break;
-          case 'warning':
-            toast.warning(data.message);
-            break;
-          default:
-            toast(data.message);
-            break;
+          const options: ExternalToast = {};
+          if (data.duration !== undefined) {
+            // wire format is seconds (or 'infinite'), sonner expects ms
+            options.duration =
+              data.duration === 'infinite' ? Infinity : data.duration * 1000;
+          }
+          if (data.position) {
+            options.position = data.position;
+          }
+          if (data.closeButton) {
+            options.closeButton = true;
+          }
+          if (data.action) {
+            const { label, url } = data.action;
+            options.action = {
+              label,
+              onClick: () => window.open(url, '_blank', 'noopener')
+            };
+          }
+
+          const message = renderToastMessage(data.message, data.markdown);
+
+          switch (data.type) {
+            case 'info':
+              toast.info(message, options);
+              break;
+            case 'error':
+              toast.error(message, options);
+              break;
+            case 'success':
+              toast.success(message, options);
+              break;
+            case 'warning':
+              toast.warning(message, options);
+              break;
+            default:
+              toast(message, options);
+              break;
+          }
         }
-      });
+      );
     },
     [setSession, sessionId, idToResume, chatProfile]
   );
