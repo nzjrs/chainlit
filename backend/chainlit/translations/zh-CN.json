@@ -142,6 +142,7 @@
         "placeholder": "搜索会话..."
       },
       "timeframes": {
+        "pinned": "已置顶",
         "today": "今天",
         "yesterday": "昨天",
         "previous7days": "过去7天",
@@ -157,6 +158,8 @@
       "untitled": "未命名对话",
       "menu": {
         "rename": "重命名",
+        "pin": "置顶",
+        "unpin": "取消置顶",
         "share": "分享",
         "delete": "删除"
       },
@@ -191,6 +194,14 @@
           },
           "success": "对话已重命名！",
           "inProgress": "正在重命名对话"
+        },
+        "pin": {
+          "inProgress": "正在置顶对话",
+          "success": "对话已置顶"
+        },
+        "unpin": {
+          "inProgress": "正在取消置顶",
+          "success": "已取消置顶"
         }
       }
     }

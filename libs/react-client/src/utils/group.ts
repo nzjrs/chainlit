@@ -14,6 +14,12 @@ export const groupByDate = (data: IThread[]) => {
   [...data]
     .sort((a, b) => lastActivity(b).getTime() - lastActivity(a).getTime())
     .forEach((item) => {
+      if (item.metadata?.pinned) {
+        groupedData['Pinned'] ??= [];
+        groupedData['Pinned'].push(item);
+        return;
+      }
+
       const threadDate = lastActivity(item);
       threadDate.setHours(0, 0, 0, 0);
 

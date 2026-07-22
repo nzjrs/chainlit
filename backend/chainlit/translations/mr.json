@@ -142,6 +142,7 @@
         "placeholder": "Search conversations..."
       },
       "timeframes": {
+        "pinned": "पिन केलेले",
         "today": "आज",
         "yesterday": "काल",
         "previous7days": "मागील 7 दिवस",
@@ -157,6 +158,8 @@
       "untitled": "शीर्षकविरहित संभाषण",
       "menu": {
         "rename": "नाव बदला",
+        "pin": "पिन करा",
+        "unpin": "अनपिन करा",
         "share": "शेअर करा",
         "delete": "हटवा"
       },
@@ -191,6 +194,14 @@
           },
           "success": "थ्रेडचे नाव बदलले!",
           "inProgress": "थ्रेडचे नाव बदलत आहे"
+        },
+        "pin": {
+          "inProgress": "चॅट पिन करत आहे",
+          "success": "चॅट पिन केली"
+        },
+        "unpin": {
+          "inProgress": "चॅट अनपिन करत आहे",
+          "success": "चॅट अनपिन केली"
         }
       }
     }

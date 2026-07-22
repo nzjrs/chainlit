@@ -142,6 +142,7 @@
         "placeholder": "Search conversations..."
       },
       "timeframes": {
+        "pinned": "Pinned",
         "today": "Today",
         "yesterday": "Yesterday",
         "previous7days": "Previous 7 days",
@@ -157,6 +158,8 @@
       "untitled": "Untitled Conversation",
       "menu": {
         "rename": "Rename",
+        "pin": "Pin",
+        "unpin": "Unpin",
         "share": "Share",
         "delete": "Delete"
       },
@@ -191,6 +194,14 @@
           },
           "success": "Thread renamed!",
           "inProgress": "Renaming thread"
+        },
+        "pin": {
+          "inProgress": "Pinning chat",
+          "success": "Chat pinned"
+        },
+        "unpin": {
+          "inProgress": "Unpinning chat",
+          "success": "Chat unpinned"
         }
       }
     }

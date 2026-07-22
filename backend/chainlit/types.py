@@ -229,6 +229,11 @@ class ShareThreadRequest(BaseModel):
     isShared: bool
 
 
+class PinThreadRequest(BaseModel):
+    threadId: str
+    pinned: bool
+
+
 class DeleteThreadRequest(BaseModel):
     threadId: str
 

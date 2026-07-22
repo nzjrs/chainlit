@@ -355,6 +355,12 @@ class SQLAlchemyDataLayer(BaseDataLayer):
             if keyword_match and feedback_match:
                 filtered_threads.append(thread)
 
+        # pinned threads first; stable sort preserves the last-activity
+        # order from the SQL query within each partition
+        filtered_threads.sort(
+            key=lambda t: not (t.get("metadata") or {}).get("pinned", False)
+        )
+
         start = 0
         if pagination.cursor:
             for i, thread in enumerate(filtered_threads):
