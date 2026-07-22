@@ -307,6 +307,22 @@ async def test_update_thread_deletes_metadata_keys_via_none(
     assert result == {"a": 1, "c": 3}
 
 
+async def test_get_all_user_threads_metadata_is_dict(
+    test_user: User, data_layer: SQLAlchemyDataLayer
+):
+    persisted_user = await data_layer.create_user(test_user)
+    assert persisted_user
+
+    await data_layer.update_thread(
+        "thread_md", user_id=persisted_user.id, metadata={"is_shared": True}
+    )
+
+    threads = await data_layer.get_all_user_threads(user_id=persisted_user.id)
+    assert threads
+    assert isinstance(threads[0]["metadata"], dict)
+    assert threads[0]["metadata"]["is_shared"] is True
+
+
 async def test_update_thread_name_update_preserves_metadata(
     data_layer: SQLAlchemyDataLayer,
 ):
