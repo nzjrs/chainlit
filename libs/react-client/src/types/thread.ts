@@ -4,6 +4,7 @@ import { IStep } from './step';
 export interface IThread {
   id: string;
   createdAt: number | string;
+  updatedAt?: number | string;
   name?: string;
   userId?: string;
   userIdentifier?: string;

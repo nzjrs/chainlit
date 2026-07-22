@@ -58,10 +58,10 @@ export default function SearchChats() {
     [apiClient]
   );
 
-  // Group threads by month and year
+  // Group threads by month and year of last activity
   const groupedThreads = useMemo(() => {
     return _.groupBy(threads, (thread) => {
-      const date = new Date(thread.createdAt);
+      const date = new Date(thread.updatedAt ?? thread.createdAt);
       return `${date.toLocaleString('default', {
         month: 'long'
       })} ${date.getFullYear()}`;

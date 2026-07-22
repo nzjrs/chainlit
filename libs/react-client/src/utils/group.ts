@@ -1,5 +1,10 @@
 import { IThread } from 'src/types';
 
+// Last activity time: time of the last message, falling back to thread
+// creation time for threads without messages.
+export const lastActivity = (thread: IThread) =>
+  new Date(thread.updatedAt ?? thread.createdAt);
+
 export const groupByDate = (data: IThread[]) => {
   const groupedData: { [key: string]: IThread[] } = {};
 
@@ -7,12 +12,9 @@ export const groupByDate = (data: IThread[]) => {
   today.setHours(0, 0, 0, 0);
 
   [...data]
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
+    .sort((a, b) => lastActivity(b).getTime() - lastActivity(a).getTime())
     .forEach((item) => {
-      const threadDate = new Date(item.createdAt);
+      const threadDate = lastActivity(item);
       threadDate.setHours(0, 0, 0, 0);
 
       const daysDiff = Math.floor(
