@@ -386,4 +386,15 @@ export class ChainlitAPI extends APIBase {
     });
     return res.json();
   }
+
+  async pinThread(
+    threadId: string,
+    pinned: boolean
+  ): Promise<{ success: boolean }> {
+    const res = await this.put(`/project/thread/pin`, {
+      threadId,
+      pinned
+    });
+    return res.json();
+  }
 }

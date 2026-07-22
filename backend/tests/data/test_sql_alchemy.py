@@ -10,6 +10,7 @@ from chainlit import User
 from chainlit.data.sql_alchemy import SQLAlchemyDataLayer
 from chainlit.data.storage_clients.base import BaseStorageClient
 from chainlit.element import Text
+from chainlit.types import Pagination, ThreadFilter
 
 
 @pytest.fixture
@@ -305,6 +306,147 @@ async def test_update_thread_deletes_metadata_keys_via_none(
     assert raw is not None
     result = json.loads(raw)
     assert result == {"a": 1, "c": 3}
+
+
+async def _insert_step(
+    data_layer: SQLAlchemyDataLayer,
+    step_id: str,
+    thread_id: str,
+    created_at: str,
+    output: str = "",
+):
+    await data_layer.execute_sql(
+        query="""
+            INSERT INTO steps
+            ("id", "name", "type", "threadId", "disableFeedback", "streaming",
+             "createdAt", "output")
+            VALUES
+            (:id, :name, :type, :threadId, :disableFeedback, :streaming,
+             :createdAt, :output)
+        """,
+        parameters={
+            "id": step_id,
+            "name": "message",
+            "type": "user_message",
+            "threadId": thread_id,
+            "disableFeedback": False,
+            "streaming": False,
+            "createdAt": created_at,
+            "output": output,
+        },
+    )
+
+
+async def test_get_all_user_threads_exposes_updated_at(
+    test_user: User, data_layer: SQLAlchemyDataLayer
+):
+    persisted_user = await data_layer.create_user(test_user)
+    assert persisted_user
+
+    await data_layer.update_thread("thread_mtime", user_id=persisted_user.id)
+    await _insert_step(data_layer, "s1", "thread_mtime", "2026-01-01T10:00:00Z")
+    await _insert_step(data_layer, "s2", "thread_mtime", "2026-01-02T10:00:00Z")
+
+    threads = await data_layer.get_all_user_threads(user_id=persisted_user.id)
+    assert threads
+    assert threads[0]["updatedAt"] == "2026-01-02T10:00:00Z"
+
+
+async def test_list_threads_orders_by_last_activity(
+    test_user: User, data_layer: SQLAlchemyDataLayer
+):
+    persisted_user = await data_layer.create_user(test_user)
+    assert persisted_user
+
+    # creation order (a, b, c) deliberately differs from last-activity order
+    for thread_id in ("thread_a", "thread_b", "thread_c", "thread_no_steps"):
+        await data_layer.update_thread(thread_id, user_id=persisted_user.id)
+    await _insert_step(data_layer, "sa", "thread_a", "2026-01-03T10:00:00Z")
+    await _insert_step(data_layer, "sb", "thread_b", "2026-01-05T10:00:00Z")
+    await _insert_step(data_layer, "sc", "thread_c", "2026-01-01T10:00:00Z")
+
+    result = await data_layer.list_threads(
+        Pagination(first=10), ThreadFilter(userId=persisted_user.id)
+    )
+
+    ordered_ids = [thread["id"] for thread in result.data]
+    assert ordered_ids == ["thread_b", "thread_a", "thread_c", "thread_no_steps"]
+    assert result.data[-1]["updatedAt"] is None
+
+
+async def test_list_threads_pinned_first(
+    test_user: User, data_layer: SQLAlchemyDataLayer
+):
+    persisted_user = await data_layer.create_user(test_user)
+    assert persisted_user
+
+    for thread_id in ("thread_old", "thread_mid", "thread_new"):
+        await data_layer.update_thread(thread_id, user_id=persisted_user.id)
+    await _insert_step(data_layer, "so", "thread_old", "2026-01-01T10:00:00Z")
+    await _insert_step(data_layer, "sm", "thread_mid", "2026-01-05T10:00:00Z")
+    await _insert_step(data_layer, "sn", "thread_new", "2026-01-06T10:00:00Z")
+
+    await data_layer.update_thread("thread_old", metadata={"pinned": True})
+
+    result = await data_layer.list_threads(
+        Pagination(first=10), ThreadFilter(userId=persisted_user.id)
+    )
+    ordered_ids = [thread["id"] for thread in result.data]
+    assert ordered_ids == ["thread_old", "thread_new", "thread_mid"]
+
+    # a second pinned thread keeps last-activity order within the pinned group
+    await data_layer.update_thread("thread_mid", metadata={"pinned": True})
+    result = await data_layer.list_threads(
+        Pagination(first=10), ThreadFilter(userId=persisted_user.id)
+    )
+    ordered_ids = [thread["id"] for thread in result.data]
+    assert ordered_ids == ["thread_mid", "thread_old", "thread_new"]
+
+
+async def test_list_threads_pinned_pagination(
+    test_user: User, data_layer: SQLAlchemyDataLayer
+):
+    persisted_user = await data_layer.create_user(test_user)
+    assert persisted_user
+
+    for i in range(5):
+        thread_id = f"thread_{i}"
+        await data_layer.update_thread(thread_id, user_id=persisted_user.id)
+        await _insert_step(
+            data_layer, f"s{i}", thread_id, f"2026-01-0{i + 1}T10:00:00Z"
+        )
+    # pin the oldest thread; it must appear on page 1 despite its age
+    await data_layer.update_thread("thread_0", metadata={"pinned": True})
+
+    filters = ThreadFilter(userId=persisted_user.id)
+    page = await data_layer.list_threads(Pagination(first=2), filters)
+    assert [t["id"] for t in page.data] == ["thread_0", "thread_4"]
+    assert page.pageInfo.hasNextPage
+
+    seen = [t["id"] for t in page.data]
+    while page.pageInfo.hasNextPage:
+        page = await data_layer.list_threads(
+            Pagination(first=2, cursor=page.pageInfo.endCursor), filters
+        )
+        seen.extend(t["id"] for t in page.data)
+
+    assert seen == ["thread_0", "thread_4", "thread_3", "thread_2", "thread_1"]
+
+
+async def test_get_all_user_threads_metadata_is_dict(
+    test_user: User, data_layer: SQLAlchemyDataLayer
+):
+    persisted_user = await data_layer.create_user(test_user)
+    assert persisted_user
+
+    await data_layer.update_thread(
+        "thread_md", user_id=persisted_user.id, metadata={"is_shared": True}
+    )
+
+    threads = await data_layer.get_all_user_threads(user_id=persisted_user.id)
+    assert threads
+    assert isinstance(threads[0]["metadata"], dict)
+    assert threads[0]["metadata"]["is_shared"] is True
 
 
 async def test_update_thread_name_update_preserves_metadata(

@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { size } from 'lodash';
-import { Share2 } from 'lucide-react';
+import { Pin, Share2 } from 'lucide-react';
 import { useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
@@ -165,6 +165,7 @@ export function ThreadList({
   const sortedTimeGroupKeys = useMemo(() => {
     if (!threadHistory?.timeGroupedThreads) return [];
     const fixedOrder = [
+      'Pinned',
       'Today',
       'Yesterday',
       'Previous 7 days',
@@ -280,8 +281,53 @@ export function ThreadList({
     });
   };
 
+  const handlePinThread = (threadId: string, pinned: boolean) => {
+    toast.promise(apiClient.pinThread(threadId, pinned), {
+      loading: (
+        <Translator
+          path={`threadHistory.thread.actions.${
+            pinned ? 'pin' : 'unpin'
+          }.inProgress`}
+        />
+      ),
+      success: () => {
+        setThreadHistory((prev) => {
+          if (!prev?.threads) return prev;
+          const next = { ...prev, threads: [...prev.threads] };
+          const idx = next.threads.findIndex((t) => t.id === threadId);
+          if (idx !== -1) {
+            const md = { ...(next.threads[idx].metadata || {}) };
+            md.pinned = pinned;
+            if (pinned) {
+              md.pinned_at = new Date().toISOString();
+            } else {
+              delete md.pinned_at;
+            }
+            next.threads[idx] = { ...next.threads[idx], metadata: md };
+          }
+          return next;
+        });
+        return (
+          <Translator
+            path={`threadHistory.thread.actions.${
+              pinned ? 'pin' : 'unpin'
+            }.success`}
+          />
+        );
+      },
+      error: (err) => {
+        if (err instanceof ClientError) {
+          return <span>{err.message}</span>;
+        } else {
+          return <span></span>;
+        }
+      }
+    });
+  };
+
   const getTimeGroupLabel = (group: string) => {
     const labels = {
+      Pinned: <Translator path="threadHistory.sidebar.timeframes.pinned" />,
       Today: <Translator path="threadHistory.sidebar.timeframes.today" />,
       Yesterday: (
         <Translator path="threadHistory.sidebar.timeframes.yesterday" />
@@ -400,6 +446,12 @@ export function ThreadList({
                                 className="relative h-9 group/thread"
                               >
                                 <span className="flex min-w-0 items-center gap-2">
+                                  {thread.metadata?.pinned ? (
+                                    <Pin
+                                      className="h-4 w-4 shrink-0 text-muted-foreground"
+                                      aria-hidden="true"
+                                    />
+                                  ) : null}
                                   {thread.metadata?.is_shared ? (
                                     <Share2
                                       className="h-4 w-4 shrink-0 text-muted-foreground"
@@ -425,6 +477,13 @@ export function ThreadList({
                                     setThreadIdToRename(thread.id);
                                     setThreadNewName(thread.name);
                                   }}
+                                  onPin={() =>
+                                    handlePinThread(
+                                      thread.id,
+                                      !thread.metadata?.pinned
+                                    )
+                                  }
+                                  isPinned={Boolean(thread.metadata?.pinned)}
                                   onShare={
                                     dataPersistence && threadSharingReady
                                       ? () => handleShareThread(thread.id)

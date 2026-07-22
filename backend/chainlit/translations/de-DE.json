@@ -142,6 +142,7 @@
         "placeholder": "Suche konversationen..."
       },
       "timeframes": {
+        "pinned": "Angeheftet",
         "today": "Heute",
         "yesterday": "Gestern",
         "previous7days": "Vor 7 Tagen",
@@ -157,6 +158,8 @@
       "untitled": "Unbenannter Thread",
       "menu": {
         "rename": "Umbenennen",
+        "pin": "Anheften",
+        "unpin": "Loslösen",
         "share": "Teilen",
         "delete": "Löschen"
       },
@@ -191,6 +194,14 @@
           },
           "success": "Thread umbenannt!",
           "inProgress": "Thread wird umbenannt"
+        },
+        "pin": {
+          "inProgress": "Chat wird angeheftet",
+          "success": "Chat angeheftet"
+        },
+        "unpin": {
+          "inProgress": "Chat wird losgelöst",
+          "success": "Chat losgelöst"
         }
       }
     }

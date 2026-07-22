@@ -142,6 +142,7 @@
         "placeholder": "Search conversations..."
       },
       "timeframes": {
+        "pinned": "מוצמדים",
         "today": "היום",
         "yesterday": "אתמול",
         "previous7days": "7 ימים אחרונים",
@@ -157,6 +158,8 @@
       "untitled": "שיחה ללא כותרת",
       "menu": {
         "rename": "שינוי שם",
+        "pin": "הצמדה",
+        "unpin": "ביטול הצמדה",
         "share": "שיתוף",
         "delete": "Delete"
       },
@@ -191,6 +194,14 @@
           },
           "success": "שם השיחה שונה!",
           "inProgress": "משנה שם שיחה"
+        },
+        "pin": {
+          "inProgress": "מצמיד את הצ'אט",
+          "success": "הצ'אט הוצמד"
+        },
+        "unpin": {
+          "inProgress": "מבטל את הצמדת הצ'אט",
+          "success": "הצמדת הצ'אט בוטלה"
         }
       }
     }

@@ -142,6 +142,7 @@
         "placeholder": "Search conversations..."
       },
       "timeframes": {
+        "pinned": "Vastgezet",
         "today": "Vandaag",
         "yesterday": "Gisteren",
         "previous7days": "Afgelopen 7 dagen",
@@ -157,6 +158,8 @@
       "untitled": "Naamloos gesprek",
       "menu": {
         "rename": "Hernoemen",
+        "pin": "Vastzetten",
+        "unpin": "Losmaken",
         "share": "Delen",
         "delete": "Verwijderen"
       },
@@ -191,6 +194,14 @@
           },
           "success": "Gesprek hernoemd!",
           "inProgress": "Gesprek hernoemen"
+        },
+        "pin": {
+          "inProgress": "Chat wordt vastgezet",
+          "success": "Chat vastgezet"
+        },
+        "unpin": {
+          "inProgress": "Chat wordt losgemaakt",
+          "success": "Chat losgemaakt"
         }
       }
     }

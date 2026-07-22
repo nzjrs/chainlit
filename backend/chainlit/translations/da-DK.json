@@ -141,6 +141,7 @@
         "placeholder": "Søg i samtaler..."
       },
       "timeframes": {
+        "pinned": "Fastgjort",
         "today": "I dag",
         "yesterday": "I går",
         "previous7days": "Seneste 7 dage",
@@ -156,6 +157,8 @@
       "untitled": "Unavngivet samtale",
       "menu": {
         "rename": "Omdøb",
+        "pin": "Fastgør",
+        "unpin": "Frigør",
         "share": "Del",
         "delete": "Slet"
       },
@@ -190,6 +193,14 @@
           },
           "success": "Tråd omdøbt!",
           "inProgress": "Omdøber tråd"
+        },
+        "pin": {
+          "inProgress": "Fastgør chat",
+          "success": "Chat fastgjort"
+        },
+        "unpin": {
+          "inProgress": "Frigør chat",
+          "success": "Chat frigjort"
         }
       }
     }

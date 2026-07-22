@@ -141,6 +141,7 @@
         "placeholder": "Search conversations..."
       },
       "timeframes": {
+        "pinned": "ピン留め",
         "today": "今日",
         "yesterday": "昨日",
         "previous7days": "過去7日間",
@@ -156,6 +157,8 @@
       "untitled": "無題の会話",
       "menu": {
         "rename": "名前を変更",
+        "pin": "ピン留めする",
+        "unpin": "ピン留めを解除",
         "share": "共有",
         "delete": "削除"
       },
@@ -190,6 +193,14 @@
           },
           "success": "スレッド名を変更しました！",
           "inProgress": "スレッド名を変更中"
+        },
+        "pin": {
+          "inProgress": "チャットをピン留めしています",
+          "success": "チャットをピン留めしました"
+        },
+        "unpin": {
+          "inProgress": "ピン留めを解除しています",
+          "success": "ピン留めを解除しました"
         }
       }
     }

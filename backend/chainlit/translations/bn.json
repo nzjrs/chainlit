@@ -142,6 +142,7 @@
         "placeholder": "Search conversations..."
       },
       "timeframes": {
+        "pinned": "পিন করা",
         "today": "আজ",
         "yesterday": "গতকাল",
         "previous7days": "গত ৭ দিন",
@@ -157,6 +158,8 @@
       "untitled": "শিরোনামহীন আলোচনা",
       "menu": {
         "rename": "পুনঃনামকরণ",
+        "pin": "পিন করুন",
+        "unpin": "আনপিন করুন",
         "share": "শেয়ার",
         "delete": "Delete"
       },
@@ -191,6 +194,14 @@
           },
           "success": "থ্রেডের নাম পরিবর্তন করা হয়েছে!",
           "inProgress": "থ্রেডের নাম পরিবর্তন করা হচ্ছে"
+        },
+        "pin": {
+          "inProgress": "চ্যাট পিন করা হচ্ছে",
+          "success": "চ্যাট পিন করা হয়েছে"
+        },
+        "unpin": {
+          "inProgress": "চ্যাট আনপিন করা হচ্ছে",
+          "success": "চ্যাট আনপিন করা হয়েছে"
         }
       }
     }

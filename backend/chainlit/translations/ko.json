@@ -142,6 +142,7 @@
         "placeholder": "대화 검색..."
       },
       "timeframes": {
+        "pinned": "고정됨",
         "today": "오늘",
         "yesterday": "어제",
         "previous7days": "지난 7일",
@@ -157,6 +158,8 @@
       "untitled": "제목 없는 대화",
       "menu": {
         "rename": "이름 변경",
+        "pin": "고정",
+        "unpin": "고정 해제",
         "share": "공유",
         "delete": "삭제"
       },
@@ -191,6 +194,14 @@
           },
           "success": "스레드 이름이 변경되었습니다!",
           "inProgress": "스레드 이름 변경 중"
+        },
+        "pin": {
+          "inProgress": "채팅 고정 중",
+          "success": "채팅이 고정되었습니다"
+        },
+        "unpin": {
+          "inProgress": "채팅 고정 해제 중",
+          "success": "채팅 고정이 해제되었습니다"
         }
       }
     }

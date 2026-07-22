@@ -23,6 +23,7 @@ from dataclasses import field
 from dataclasses_json import DataClassJsonMixin
 from pydantic import BaseModel
 from pydantic.dataclasses import dataclass
+from typing_extensions import NotRequired
 
 InputWidgetType = Literal[
     "switch",
@@ -55,6 +56,7 @@ class ToastAction(TypedDict):
 class ThreadDict(TypedDict):
     id: str
     createdAt: str
+    updatedAt: NotRequired[Optional[str]]
     name: Optional[str]
     userId: Optional[str]
     userIdentifier: Optional[str]
@@ -238,6 +240,11 @@ class UpdateThreadRequest(BaseModel):
 class ShareThreadRequest(BaseModel):
     threadId: str
     isShared: bool
+
+
+class PinThreadRequest(BaseModel):
+    threadId: str
+    pinned: bool
 
 
 class DeleteThreadRequest(BaseModel):

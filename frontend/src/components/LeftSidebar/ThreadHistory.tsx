@@ -82,7 +82,7 @@ export function ThreadHistory() {
           const updatedThreads = [...prev.threads];
           updatedThreads[threadIndex] = {
             ...updatedThreads[threadIndex],
-            createdAt: new Date().toISOString()
+            updatedAt: new Date().toISOString()
           };
           return { ...prev, threads: updatedThreads };
         });

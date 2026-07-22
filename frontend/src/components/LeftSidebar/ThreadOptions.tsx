@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { Ellipsis, Share2, Trash2 } from 'lucide-react';
+import { Ellipsis, Pin, PinOff, Share2, Trash2 } from 'lucide-react';
 
 import { Pencil } from '@/components/icons/Pencil';
 import { buttonVariants } from '@/components/ui/button';
@@ -15,6 +15,8 @@ import { Translator } from '../i18n';
 interface Props {
   onDelete: () => void;
   onRename: () => void;
+  onPin?: () => void;
+  isPinned?: boolean;
   onShare?: () => void;
   className?: string;
 }
@@ -22,6 +24,8 @@ interface Props {
 export default function ThreadOptions({
   onDelete,
   onRename,
+  onPin,
+  isPinned,
   onShare,
   className
 }: Props) {
@@ -54,6 +58,28 @@ export default function ThreadOptions({
           <Translator path="threadHistory.thread.menu.rename" />
           <Pencil className="ml-auto" />
         </DropdownMenuItem>
+        {onPin && (
+          <DropdownMenuItem
+            id="pin-thread"
+            onClick={(e) => {
+              e.stopPropagation();
+              onPin();
+            }}
+          >
+            <Translator
+              path={
+                isPinned
+                  ? 'threadHistory.thread.menu.unpin'
+                  : 'threadHistory.thread.menu.pin'
+              }
+            />
+            {isPinned ? (
+              <PinOff className="ml-auto" />
+            ) : (
+              <Pin className="ml-auto" />
+            )}
+          </DropdownMenuItem>
+        )}
         {onShare && (
           <DropdownMenuItem
             id="share-thread"

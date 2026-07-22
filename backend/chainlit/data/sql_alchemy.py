@@ -355,6 +355,12 @@ class SQLAlchemyDataLayer(BaseDataLayer):
             if keyword_match and feedback_match:
                 filtered_threads.append(thread)
 
+        # pinned threads first; stable sort preserves the last-activity
+        # order from the SQL query within each partition
+        filtered_threads.sort(
+            key=lambda t: not (t.get("metadata") or {}).get("pinned", False)
+        )
+
         start = 0
         if pagination.cursor:
             for i, thread in enumerate(filtered_threads):
@@ -678,7 +684,7 @@ class SQLAlchemyDataLayer(BaseDataLayer):
                 t."userIdentifier" AS user_identifier,
                 t."tags" AS thread_tags,
                 t."metadata" AS thread_metadata,
-                MAX(s."createdAt") AS updatedAt
+                MAX(s."createdAt") AS "updatedAt"
             FROM threads t
             LEFT JOIN steps s ON t."id" = s."threadId"
             WHERE t."userId" = :user_id OR t."id" = :thread_id
@@ -690,7 +696,7 @@ class SQLAlchemyDataLayer(BaseDataLayer):
                 t."userIdentifier",
                 t."tags",
                 t."metadata"
-            ORDER BY updatedAt DESC NULLS LAST
+            ORDER BY "updatedAt" DESC NULLS LAST
             LIMIT :limit
         """
         user_threads = await self.execute_sql(
@@ -768,14 +774,19 @@ class SQLAlchemyDataLayer(BaseDataLayer):
         for thread in user_threads:
             thread_id = thread["thread_id"]
             if thread_id is not None:
+                # SQLite returns JSON as string, we must convert it. (#1137)
+                metadata = thread["thread_metadata"]
+                if isinstance(metadata, str):
+                    metadata = json.loads(metadata)
                 thread_dicts[thread_id] = ThreadDict(
                     id=thread_id,
                     createdAt=thread["thread_createdat"],
+                    updatedAt=thread["updatedAt"],
                     name=thread["thread_name"],
                     userId=thread["user_id"],
                     userIdentifier=thread["user_identifier"],
                     tags=thread["thread_tags"],
-                    metadata=thread["thread_metadata"],
+                    metadata=metadata,
                     steps=[],
                     elements=[],
                 )

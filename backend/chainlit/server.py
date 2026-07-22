@@ -69,6 +69,7 @@ from chainlit.types import (
     DisconnectMCPRequest,
     ElementRequest,
     GetThreadsRequest,
+    PinThreadRequest,
     ShareThreadRequest,
     Theme,
     UpdateFeedbackRequest,
@@ -1218,6 +1219,49 @@ async def share_thread(
     except Exception as e:
         logger.exception("[share_thread] update_thread failed: %s", e)
         raise
+
+    return JSONResponse(content={"success": True})
+
+
+@router.put("/project/thread/pin")
+async def pin_thread(
+    request: Request,
+    payload: PinThreadRequest,
+    current_user: UserParam,
+):
+    """Pin or unpin a thread in the sidebar (author only)."""
+
+    data_layer = get_data_layer()
+
+    if not data_layer:
+        raise HTTPException(status_code=400, detail="Data persistence is not enabled")
+
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    thread_id = payload.threadId
+
+    await is_thread_author(current_user.identifier, thread_id)
+
+    # Fetch current thread and metadata, then toggle pinned
+    thread = await data_layer.get_thread(thread_id=thread_id)
+    metadata = (thread.get("metadata") if thread else {}) or {}
+    if isinstance(metadata, str):
+        try:
+            metadata = json.loads(metadata)
+        except Exception:
+            metadata = {}
+    if not isinstance(metadata, dict):
+        metadata = {}
+
+    metadata = dict(metadata)
+    pinned = bool(payload.pinned)
+    metadata["pinned"] = pinned
+    if pinned:
+        metadata["pinned_at"] = utc_now()
+    else:
+        metadata.pop("pinned_at", None)
+    await data_layer.update_thread(thread_id=thread_id, metadata=metadata)
 
     return JSONResponse(content={"success": True})
 
